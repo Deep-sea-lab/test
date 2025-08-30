@@ -1,0 +1,29 @@
+name: Sign Windows Executable
+
+on:
+  workflow_dispatch: # 手动触发
+
+jobs:
+  sign:
+    runs-on: windows-latest
+
+    steps:
+      # 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 运行 sign_windows.cmd 脚本
+      - name: Run sign_windows.cmd
+        run: deepsigntool\sign_windows.cmd
+        shell: cmd
+        env:
+          CERTIFICATE: ${{ secrets.CERTIFICATE }}
+          CERT_PASSWORD: ${{ secrets.CERT_PASSWORD }}
+          CERT_SHA1: ${{ secrets.CERT_SHA1 }}
+
+      # 上传签名后的文件
+      - name: Upload signed artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-files
+          path: windows_signed/
